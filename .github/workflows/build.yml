@@ -1,0 +1,22 @@
+name: Build WhateverXe
+on:
+  workflow_dispatch:
+  push:
+    branches: [ gputicks-bootarg ]
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch Dependencies
+        run: |
+          git clone https://github.com/acidanthera/MacKernelSDK.git
+          curl -LO https://github.com/acidanthera/Lilu/releases/download/1.7.0/Lilu-1.7.0-DEBUG.zip
+          unzip Lilu-1.7.0-DEBUG.zip -d Lilu_Temp && cp -R Lilu_Temp/Lilu.kext .
+      - name: Build Kext
+        run: xcodebuild -configuration Release
+      - name: Upload Kext
+        uses: actions/upload-artifact@v4
+        with:
+          name: WhateverXe-Release
+          path: build/Release/WhateverXe.kext
